@@ -97,7 +97,7 @@ def extractPasswords(url, proxy_url=None, user_file=None, usernames_list=None, o
             password = enumeratePassword(url, session, username, p1)
             
             if password:
-                log.success(f"✓ Password found -> {username}:{password}")
+                log.success(f"✓ Credentials found -> {username}:{password}")
                 credential = f"{username}:{password}"
                 credentials.append(credential)
                 passwords_only.append(password)
