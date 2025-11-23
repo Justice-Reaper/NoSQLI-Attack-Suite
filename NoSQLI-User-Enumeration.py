@@ -73,8 +73,8 @@ def makeRequest(url, proxy_url=None):
                     break
     
     if usernames:
-        log.success(f"Total users found: {len(usernames)}")
-        log.success("Users saved in " + filename)
+        log.info(f"Total users found: {len(usernames)}")
+        log.info("Users saved in " + filename)
     else:
         log.failure("No users found")
 
