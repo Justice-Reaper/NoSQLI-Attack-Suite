@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+
 from pwn import *
 import requests, signal, time, pdb, sys, string, argparse, urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -62,7 +63,6 @@ def makeRequest(url, proxy_url=None, output_file="usernames.txt"):
             if current_username and current_username not in usernames:
                 usernames.append(current_username)
                 
-                # Escribir inmediatamente en el archivo
                 mode = 'a' if file_created else 'w'
                 with open(output_file, mode) as f:
                     f.write(f"{current_username}\n")
