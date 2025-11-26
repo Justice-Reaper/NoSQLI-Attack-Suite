@@ -116,8 +116,8 @@ def extractPasswords(url, proxy_url=None, user_file=None, usernames_list=None, o
     
     if credentials:
         log.info(f"Total passwords found: {len(credentials)}")
-        log.info(f"Credentials saved in {output_file}")
-        log.info(f"Passwords saved in {passwords_file}")
+        log.info(f"Credentials saved to {output_file}")
+        log.info(f"Passwords saved to {passwords_file}")
     else:
         log.failure("No passwords found")
 
