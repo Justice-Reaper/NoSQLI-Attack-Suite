@@ -62,6 +62,11 @@ def loadUsersFromFile(filename):
 
 def extractPasswords(url, proxy_url=None, user_file=None, usernames_list=None, output_file="credentials.txt", passwords_file="passwords.txt"):
     session = requests.Session()
+
+    session.headers.update({
+        'Content-Type': 'application/json',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+    })
     
     if proxy_url:
         proxies = {
