@@ -12,7 +12,7 @@ signal.signal(signal.SIGINT, def_handler)
 
 def enumeratePassword(url, session, username, p1):
     password = ""
-    characters = "".join(sorted(set(char for char in string.printable if char.isprintable() and char != " "), key=string.printable.index))
+    characters = "".join(sorted(set(char for char in string.printable if char.isprintable()), key=string.printable.index))
     
     while True:
         character_found = False
