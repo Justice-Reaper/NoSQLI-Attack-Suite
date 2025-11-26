@@ -12,7 +12,7 @@ signal.signal(signal.SIGINT, def_handler)
 
 session = None
 
-def init_session(proxy_url=None):
+def initialize_session(proxy_url=None):
     global session
     session = requests.Session()
     
@@ -242,10 +242,7 @@ def enumerate_field_values(url, field_names_list, field_value_lengths, field_ind
     return field_values
 
 def execute_nosql_enumeration(url, proxy_url=None, output_file='fields.txt'):
-    init_session(proxy_url)
-    
-    if proxy_url:
-        log.info(f"Using proxy: {proxy_url}")
+    initialize_session(proxy_url)
     
     progress_bar = log.progress("Enumerating number of fields")
     progress_bar.status("Starting brute-force attack")
