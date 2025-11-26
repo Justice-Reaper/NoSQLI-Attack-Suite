@@ -27,7 +27,7 @@ options:
 [+] ✓ User found: carlos
 [+] ✓ User found: adminfmr61qyc
 [*] Total users found: 3
-[*] Users saved in usernames.txt
+[*] Users saved to usernames.txt
 ```
 
 ## NoSQLI Password Dumper
@@ -76,6 +76,6 @@ Usage examples:
 [+] ✓ Credentials found -> adminfmr61qyc:qhgldjomevihy2034s3s
 [+] ✓ Credentials found -> carlos:epuoerwg1uf5o1apmw3v
 [*] Total passwords found: 3
-[*] Credentials saved in credentials.txt
-[*] Passwords saved in passwords.txt
+[*] Credentials saved to credentials.txt
+[*] Passwords saved to passwords.txt
 ```
