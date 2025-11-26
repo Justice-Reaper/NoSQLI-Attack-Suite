@@ -23,7 +23,7 @@ def makeRequest(url, proxy_url=None, output_file="usernames.txt"):
     
     usernames = []
     current_username = ""
-    characters = "".join(sorted(set(char for char in string.printable if char.isprintable() and char != " "), key=string.printable.index))
+    characters = "".join(sorted(set(char for char in string.printable if char.isprintable()), key=string.printable.index))
     file_created = False
     
     p1 = log.progress("Enumerating users")
