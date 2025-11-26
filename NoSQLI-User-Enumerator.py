@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-
 from pwn import *
 import requests, signal, time, pdb, sys, string, argparse, urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -12,6 +11,11 @@ signal.signal(signal.SIGINT, def_handler)
 
 def makeRequest(url, proxy_url=None, output_file="usernames.txt"):
     session = requests.Session()
+
+    session.headers.update({
+        'Content-Type': 'application/json',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+    })
     
     if proxy_url:
         proxies = {
