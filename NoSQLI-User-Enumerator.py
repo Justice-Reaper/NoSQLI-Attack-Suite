@@ -49,7 +49,7 @@ def makeRequest(url, proxy_url=None, output_file="usernames.txt"):
             p1.status(data)
             
             try:
-                request = session.post(url, json=data, allow_redirects=False, timeout=10)
+                request = session.post(url, json=data, allow_redirects=False, timeout=300)
             except requests.exceptions.RequestException as e:
                 log.error(f"Request error: {e}")
                 continue
