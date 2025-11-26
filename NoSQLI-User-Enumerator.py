@@ -76,7 +76,7 @@ def makeRequest(url, proxy_url=None, output_file="usernames.txt"):
     
     if usernames:
         log.info(f"Total users found: {len(usernames)}")
-        log.info(f"Users saved in {output_file}")
+        log.info(f"Users saved to {output_file}")
     else:
         log.failure("No users found")
 
