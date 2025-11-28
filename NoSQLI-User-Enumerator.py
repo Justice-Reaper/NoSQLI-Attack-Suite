@@ -30,7 +30,12 @@ def initialize_session(proxy_url=None):
 
 def make_request(session, url, payload):
     try:
-        response = session.post(url, json=payload, allow_redirects=False, timeout=300)
+        response = session.post(
+            url,
+            json=payload,
+            timeout=300,
+            allow_redirects=False
+        )
         return response
     except requests.exceptions.RequestException as e:
         log.error(f"Request error: {e}")
@@ -66,7 +71,7 @@ def enumerate_usernames(session, url):
             
             response = make_request(session, url, payload)
             
-            if response and response.status_code == 302:
+            if response.status_code == 302:
                 current_username += character
                 character_found = True
                 break
