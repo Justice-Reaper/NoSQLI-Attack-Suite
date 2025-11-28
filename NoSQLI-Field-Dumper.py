@@ -249,11 +249,11 @@ def prompt_field_selection(total_fields, field_names_list):
         user_input = input(f"[?] Enter field indexes to dump (0-{total_fields-1}, comma-separated) or 'all' for all fields: ").strip()
         
         if user_input.lower() == 'all':
-            field_indexes = [i for i, name in enumerate(field_names_list) if name is not None]
+            field_indexes = [index for index, name in enumerate(field_names_list) if name is not None]
             break
         else:
             try:
-                indexes = [int(idx.strip()) for idx in user_input.split(',')]
+                indexes = [int(index.strip()) for index in user_input.split(',')]
                 valid_indexes = []
                 invalid_index_found = False
                 
