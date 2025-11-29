@@ -41,7 +41,6 @@ def make_request(session, url, payload):
             allow_redirects=False
         )
         return response
-        
     except requests.exceptions.RequestException as e:
         log.error(f"Request error: {e}")
         return None
@@ -59,7 +58,6 @@ def save_credentials_and_passwords(credentials, credentials_file, password_file)
         
         log.info(f"Credentials saved to {credentials_file}")
         log.info(f"Passwords saved to {password_file}")
-        
     except Exception as e:
         log.error(f"Error saving credentials: {e}")
 
@@ -75,11 +73,9 @@ def load_users_from_file(user_file):
         log.info("Using provided users file")
         log.info(f"Total users to process: {len(users)}")
         return users
-        
     except FileNotFoundError:
         log.error(f"File not found: {user_file}")
         sys.exit(1)
-        
     except Exception as e:
         log.error(f"Error reading file: {e}")
         sys.exit(1)
@@ -152,7 +148,6 @@ def main(url, proxy_url=None, verify_ssl=True, user_file=None, user_list=None, c
     enumeratePasswords(url, session, users, credentials_file, password_file)
 
 if __name__ == '__main__':
-    
     class CustomFormatter(argparse.RawDescriptionHelpFormatter):
         def __init__(self, prog):
             super().__init__(prog, max_help_position=35, width=150)
