@@ -6,16 +6,17 @@ These scripts enumerate usernames and passwords from web applications vulnerable
 ### Help panel
 
 ```
-# python NoSQLI-Field-Dumper.py -h                                                                                                      
-usage: NoSQLI-Field-Dumper.py [-h] -u  [-p ] [-o ]
+# python NoSQLI-Field-Dumper.py -h
+usage: NoSQLI-Field-Dumper.py [-h] -u  [-p ] [-k] [-o ]
 
 MongoDB Fields Enumeration via NoSQL Injection
 
 options:
-  -h, --help     Show this help message and exit
-  -u, --url      Target URL (e.g. https://example.com/login)
-  -p, --proxy    Proxy URL (e.g. http://127.0.0.1:8080)
-  -o, --output   Output file (default: fields.txt)
+  -h, --help      Show this help message and exit
+  -u, --url       Target URL (e.g. https://example.com/login)
+  -p, --proxy     Proxy URL (e.g. http://127.0.0.1:8080)
+  -k, --insecure  Disable SSL certificate verification (for self-signed certificates/invalid certificates)
+  -o, --output    Output file (default: fields.txt)
 ```
 
 ### Usage
@@ -64,16 +65,17 @@ options:
 ### Help panel
 
 ```
-# python NoSQLI-User-Enumerator.py -h                                                                                                          
-usage: NoSQLI-User-Enumerator.py [-h] -u [-p ] [-o ]
+# python NoSQLI-User-Enumerator.py -h                                                                           
+usage: NoSQLI-User-Enumerator.py [-h] -u  [-p ] [-k] [-o ]
 
 MongoDB Username Enumeration via NoSQL Injection
 
 options:
-  -h, --help     Show this help message and exit
-  -u, --url      Target URL (e.g. https://example.com/login)
-  -p, --proxy    Proxy URL (e.g. http://127.0.0.1:8080)
-  -o, --output   Output file (default: usernames.txt)
+  -h, --help      Show this help message and exit
+  -u, --url       Target URL (e.g. https://example.com/login)
+  -p, --proxy     Proxy URL (e.g. http://127.0.0.1:8080)
+  -k, --insecure  Disable SSL certificate verification (for self-signed certificates/invalid certificates)
+  -o, --output    Output file (default: usernames.txt)
 ```
 
 ### Usage
@@ -94,33 +96,19 @@ options:
 
 ```
 # python NoSQLI-Password-Dumper.py -h
-usage: NoSQLI-Password-Dumper.py [-h] -u  [-p ] (-uf  | -ul ) [-oc ] [-op ]
+usage: NoSQLI-Password-Dumper.py [-h] -u  [-p ] [-k] (-uf  | -ul ) [-oc ] [-op ]
 
 Tool to extract passwords using NoSQL Injection in MongoDB
 
 options:
-  -h, --help                  show this help message and exit
+  -h, --help                  Show this help message and exit
   -u, --url                   Target URL of the login endpoint (e.g.: https://example.com/login)
   -p, --proxy                 Proxy URL to intercept traffic (e.g.: http://127.0.0.1:8080)
+  -k, --insecure              Disable SSL certificate verification (for self-signed certificates/invalid certificates)
   -uf, --user-file            Text file containing users (one per line)
   -ul, --user-list            Comma-separated list of users (e.g.: admin,root,test)
   -oc, --output-credentials   File to save credentials in user:pass format (default: credentials.txt)
   -op, --output-passwords     File to save only passwords (default: passwords.txt)
-
-Usage examples:
-  
-  Extract passwords loading users from a file:
-    NoSQLI-Password-Dumper.py -u https://target.com/login -uf users.txt
-    NoSQLI-Password-Dumper.py -u https://target.com/login -uf users.txt -oc credentials.txt
-    NoSQLI-Password-Dumper.py -u https://target.com/login -uf users.txt -p http://127.0.0.1:8080
-
-  Extract passwords using a list of users:
-    NoSQLI-Password-Dumper.py -u https://target.com/login -ul admin,root,test
-    NoSQLI-Password-Dumper.py -u https://target.com/login -ul admin,user -oc admin_creds.txt
-    NoSQLI-Password-Dumper.py -u https://target.com/login -ul admin -p http://127.0.0.1:8080
-
-  Set a proxy:
-    NoSQLI-Password-Dumper.py -u https://target.com/login -uf users.txt -p http://127.0.0.1:8080 -oc results.txt
 ```
 
 ### Usage
