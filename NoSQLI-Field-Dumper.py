@@ -310,7 +310,7 @@ def save_and_display_results(field_indexes, field_names_list, field_values, outp
         log.error(f"Failed to save results: {e}")
         return False
 
-def main(url, proxy_url=None, verify_ssl=True output_file='fields.txt'):
+def main(url, proxy_url=None, verify_ssl=True, output_file='fields.txt'):
     session = initialize_session(proxy_url, verify_ssl)
     
     total_fields = get_number_of_fields(session, url)
