@@ -11,7 +11,7 @@ def def_handler(sig, frame):
 
 signal.signal(signal.SIGINT, def_handler)
 
-def initialize_session(proxy_url=None):
+def initialize_session(proxy_url=None, verify_ssl):
     session = requests.Session()
     
     session.headers.update({
@@ -20,12 +20,16 @@ def initialize_session(proxy_url=None):
     })
     
     if proxy_url:
-        session.proxies = {
+        proxies = {
             'http': proxy_url,
             'https': proxy_url
         }
+        session.proxies = proxies
+        session.verify = False
         
-    session.verify = False
+    elif not verify_ssl:
+        session.verify = False
+    
     return session
 
 def make_request(session, url, payload):
@@ -101,8 +105,8 @@ def save_results(usernames, output_file):
     else:
         log.failure("No users found")
 
-def main(url, proxy_url=None, output_file="usernames.txt"):
-    session = initialize_session(proxy_url)
+def main(url, proxy_url=None, verify_ssl=True, output_file="usernames.txt"):
+    session = initialize_session(proxy_url, verify_ssl)
     
     usernames = enumerate_usernames(session, url)
     
@@ -115,13 +119,20 @@ if __name__ == '__main__':
     )
     parser.add_argument('-h', '--help', action='help', 
                        help='Show this help message and exit')
+    
     parser.add_argument('-u', '--url', required=True, metavar='', 
                        help='Target URL (e.g. https://example.com/login)')
+    
     parser.add_argument('-p', '--proxy', metavar='', 
                        help='Proxy URL (e.g. http://127.0.0.1:8080)')
+
+    parser.add_argument('-k', '--insecure',
+                       action='store_true',
+                       help='Disable SSL certificate verification (for self-signed certificates/invalid certificates)')
+    
     parser.add_argument('-o', '--output', default='usernames.txt', metavar='', 
                        help='Output file (default: usernames.txt)')
     
     args = parser.parse_args()
     
-    main(url=args.url, proxy_url=args.proxy, output_file=args.output)
+    main(url=args.url, proxy_url=args.proxy, verify_ssl=not args.insecure, output_file=args.output)
