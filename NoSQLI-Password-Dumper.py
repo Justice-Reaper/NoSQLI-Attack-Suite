@@ -160,31 +160,21 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='Tool to extract passwords using NoSQL Injection in MongoDB',
         formatter_class=CustomFormatter,
-        epilog='''
-Usage examples:
-  
-  Extract passwords loading users from a file:
-    %(prog)s -u https://target.com/login -uf users.txt
-    %(prog)s -u https://target.com/login -uf users.txt -oc credentials.txt
-    %(prog)s -u https://target.com/login -uf users.txt -p http://127.0.0.1:8080
+        add_help=False)
 
-  Extract passwords using a list of users:
-    %(prog)s -u https://target.com/login -ul admin,root,test
-    %(prog)s -u https://target.com/login -ul admin,user -oc admin_creds.txt
-    %(prog)s -u https://target.com/login -ul admin -p http://127.0.0.1:8080
-
-  For targets with invalid SSL certificates:
-    %(prog)s -u https://target.com/login -uf users.txt -k
-    %(prog)s -u https://target.com/login -ul admin -k -p http://127.0.0.1:8080
-        ''' )
+    parser.add_argument('-h', '--help', 
+                        action='help', 
+                        help='Show this help message and exit')
     
     parser.add_argument('-u', '--url', 
                         required=True,
                         metavar='',
                         help='Target URL of the login endpoint (e.g.: https://example.com/login)')
+    
     parser.add_argument('-p', '--proxy',
                         metavar='',
                         help='Proxy URL to intercept traffic (e.g.: http://127.0.0.1:8080)')
+    
     parser.add_argument('-k', '--insecure',
                         action='store_true',
                         help='Disable SSL certificate verification (for self-signed certificates/invalid certificates)')
@@ -193,6 +183,7 @@ Usage examples:
     users_input.add_argument('-uf', '--user-file',
                             metavar='',
                             help='Text file containing users (one per line)')
+    
     users_input.add_argument('-ul', '--user-list',
                             metavar='',
                             help='Comma-separated list of users (e.g.: admin,root,test)')
@@ -201,6 +192,7 @@ Usage examples:
                           metavar='',
                           default='credentials.txt',
                           help='File to save credentials in user:pass format (default: credentials.txt)')
+    
     parser.add_argument('-op', '--output-passwords',
                           metavar='',
                           default='passwords.txt',
