@@ -11,7 +11,7 @@ def def_handler(sig, frame):
 
 signal.signal(signal.SIGINT, def_handler)
 
-def initialize_session(proxy_url=None, verify_ssl=True):
+def initialize_session(proxy_url=None, verify_ssl):
     session = requests.Session()
     
     session.headers.update({
