@@ -48,10 +48,7 @@ def make_request(session, url, payload):
 def enumerate_usernames(session, url):
     usernames = []
     current_username = ""
-    characters = "".join(sorted(
-        set(character for character in string.printable if character.isprintable()), 
-        key=string.printable.index
-    ))
+    characters = "".join(sorted(set(char for char in string.printable if char.isprintable()), key=string.printable.index))
     
     progress_bar = log.progress("Enumerating users")
     progress_bar.status("Starting brute-force attack")
