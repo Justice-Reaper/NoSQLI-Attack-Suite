@@ -94,7 +94,7 @@ def get_field_lengths(session, url, total_fields):
     return field_lengths_list
 
 def get_field_names(session, url, field_lengths_list):
-    characters = "".join(sorted(set(character for character in string.printable if character.isprintable()), key=string.printable.index))
+    characters = "".join(sorted(set(char for char in string.printable if char.isprintable()), key=string.printable.index))
     field_names_list = []
     print()
     progress_bar = log.progress("Enumerating field names")
@@ -105,7 +105,6 @@ def get_field_names(session, url, field_lengths_list):
             field_names_list.append(None)
             continue
         
-        progress_bar.status(f"Extracting field {current_field_index}/{len(field_lengths_list)-1} (length: {current_field_length})")
         extracted_field_name = ""
         field_progress_bar = log.progress(f"Field {current_field_index}")
         
@@ -166,7 +165,7 @@ def get_field_value_lengths(session, url, field_names_list, field_indexes):
     return field_value_lengths
 
 def get_field_value_names(session, url, field_names_list, field_value_lengths, field_indexes):
-    characters = "".join(sorted(set(character for character in string.printable if character.isprintable()), key=string.printable.index))
+    characters = "".join(sorted(set(char for char in string.printable if char.isprintable()), key=string.printable.index))
     field_values = {}
     print()
     progress_bar = log.progress("Enumerating field values")
@@ -184,7 +183,6 @@ def get_field_value_names(session, url, field_names_list, field_value_lengths, f
             field_values[current_field_name] = None
             continue
         
-        progress_bar.status(f"Extracting value for field {current_field_index} (length: {current_value_length})")
         extracted_field_value = ""
         field_progress_bar = log.progress(f"Field {current_field_index}")
         
