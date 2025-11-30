@@ -35,7 +35,7 @@ def initialize_session(proxy_url, verify_ssl):
 
 def make_request(session, url, payload):
     try:
-        encoded_payload = quote_plus(payload, safe='')
+        encoded_payload = quote_plus(payload)
         response = session.get(
             f"{url}{encoded_payload}%00",
             timeout=300,
