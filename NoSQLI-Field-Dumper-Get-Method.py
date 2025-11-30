@@ -318,7 +318,7 @@ def main(url, proxy_url=None, verify_ssl=True, output_file='fields.txt'):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        description='MongoDB Fields Enumeration via NoSQL Injection (GET Method)',
+        description='MongoDB Fields Enumeration via NoSQL Injection',
         add_help=False
     )
     
