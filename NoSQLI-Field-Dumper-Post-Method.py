@@ -45,7 +45,7 @@ def make_request(session, url, payload):
         log.error(f"Error during request: {e}")
         return False
 
-def escape__character(character):
+def escape_character(character):
     if character == '\\':
         return '\\\\\\\\'
     elif character in '.^$*+?{}[]|()':
@@ -124,7 +124,7 @@ def get_field_names(session, url, field_lengths_list):
             character_found = None
             
             for character in characters:
-                character = escape__character(character)
+                character = escape_character(character)
                 
                 payload = {
                     "username": "wiener",
@@ -215,7 +215,7 @@ def get_field_value_names(session, url, field_names_list, field_value_lengths, f
             character_found = None
             
             for character in characters:
-                character = escape__character(character)
+                character = escape_character(character)
                 
                 payload = {
                     "username": "wiener",
