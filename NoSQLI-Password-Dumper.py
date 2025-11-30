@@ -94,7 +94,7 @@ def load_users_from_list(user_list):
 def enumeratePasswords(url, session, users, credentials_file, password_file):
     progress_bar = log.progress("Enumerating passwords")
     credentials = []
-    characters = "".join(sorted(set(character for character in string.printable if character.isprintable()), key=string.printable.index))
+    characters = "".join(sorted(set(char for char in string.printable if char.isprintable()), key=string.printable.index))
     
     for user in users:
         password = ""
