@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 from pwn import *
-import requests, signal, time, pdb, sys, string, argparse, urllib3
+import requests, signal, sys, string, argparse, urllib3
 from urllib.parse import quote_plus
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
