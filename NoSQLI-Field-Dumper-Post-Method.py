@@ -116,7 +116,6 @@ def get_field_names(session, url, field_lengths_list):
             field_names_list.append(None)
             continue
         
-        progress_bar.status(f"Extracting field {current_field_index}/{len(field_lengths_list)-1} (length: {current_field_length})")
         extracted_field_name = ""
         field_progress_bar = log.progress(f"Field {current_field_index}")
         
@@ -207,7 +206,6 @@ def get_field_value_names(session, url, field_names_list, field_value_lengths, f
             field_values[current_field_name] = None
             continue
         
-        progress_bar.status(f"Extracting value for field {current_field_index} (length: {current_value_length})")
         extracted_field_value = ""
         field_progress_bar = log.progress(f"Field {current_field_index}")
         
