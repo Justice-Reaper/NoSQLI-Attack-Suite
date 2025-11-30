@@ -329,7 +329,7 @@ if __name__ == '__main__':
     parser.add_argument('-u', '--url', 
                         required=True, 
                         metavar='', 
-                        help='Target URL (e.g. https://example.com/filter?category=)')
+                        help='Target URL (e.g. https://example.com/user/lookup?user=)')
     
     parser.add_argument('-p', '--proxy', 
                         metavar='', 
