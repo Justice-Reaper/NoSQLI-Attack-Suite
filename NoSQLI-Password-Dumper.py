@@ -113,7 +113,7 @@ def enumeratePasswords(url, session, users, credentials_file, password_file):
                     }
                 }
                 
-                progress_bar.status(f"{{'username': '{user}', 'password': {{'$regex': '^{password}{character}'}}}}")
+                progress_bar.status(str(payload)[-200:])
                 
                 response = make_request(session, url, payload)
                 
