@@ -13,7 +13,7 @@ MongoDB Fields Enumeration via NoSQL Injection
 
 options:
   -h, --help      Show this help message and exit
-  -u, --url       Target URL (e.g. https://example.com/filter?category=)
+  -u, --url       Target URL (e.g. https://example.com/user/lookup?user=)
   -p, --proxy     Proxy URL (e.g. http://127.0.0.1:8080)
   -k, --insecure  Disable SSL certificate verification (for self-signed certificates/invalid certificates)
   -o, --output    Output file (default: fields.txt)
